@@ -1,0 +1,93 @@
+jQuery( document ).ready(function($)
+{
+    'use strict'
+
+	console.log('Run file "show-big-picture.js"!\nFile consist of owl-carousel for bluda.')
+
+	var $imgs = document.querySelectorAll('.show_picture')
+	var $imgsLength = $imgs.length
+	var i = 0
+
+	function showBigImg()
+	{
+		var $divModal = document.createElement('div')
+			$divModal.classList.add('modal_big_img')
+		var $figure = document.createElement('figure')
+
+		this.classList.remove('show_picture')
+		
+		if ( this.tagName == 'IMG' )
+			$figure.appendChild(this.cloneNode())
+		else
+		{
+			var strStyle = this.getAttribute('style')
+				strStyle = strStyle.slice(strStyle.indexOf('http'))
+				strStyle = strStyle.slice(0, strStyle.indexOf(')'))
+
+			var $img = document.createElement('img')
+				$img.setAttribute('src', strStyle)
+				$img.setAttribute('alt', '#')
+
+			$figure.appendChild($img)
+		}
+
+		$divModal.appendChild($figure)
+
+		document.body.appendChild($divModal)
+		document.body.style.overflow = 'hidden'
+		document.body.style.paddingRight = '18px'
+		$divModal.addEventListener('click', closeBigImg, false)
+
+		event.preventDefault()
+	}
+	
+	function closeBigImg()
+	{
+		document.body.style.overflow = ''
+		document.body.style.paddingRight = ''
+
+		this.removeEventListener('click', closeBigImg, false)
+		this.parentNode.removeChild(this)
+	}
+
+
+	while ( i < $imgsLength )
+	{
+		$imgs[i].addEventListener('click', showBigImg, false)
+
+		i++
+	}
+
+	$(".owl-carousel-bluda").owlCarousel(
+	{
+	  	items:1,
+	  	nav: true,
+	  	navText: ['', ''],
+	  	dots: false,
+	  	loop: true,
+	  	autoplay: true,
+	  	autoplayTimeout: 5000,
+	  	autoplayHoverPause: true
+	})
+
+	if( $(".zaved_content").height() < $(".zaved_sidebar").height() ) {
+		
+		var gutter = 0
+		if ( location.pathname == '/')
+			gutter = 20
+		else
+			gutter = 10
+		$(".additional_zavedeniya").show();
+
+			jQuery('.additional_zavedeniya .grid').masonry(
+			{
+			  	columnWidth: 230,
+			  	itemSelector: '.grid-item',
+			  	gutter: gutter,
+			  	isFitWidth: true
+			})	
+		
+	} 
+});
+
+

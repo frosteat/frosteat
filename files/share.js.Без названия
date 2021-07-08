@@ -1,0 +1,229 @@
+jQuery(document).ready(function($) {
+    var elementSharefb = document.getElementsByClassName('btn_share_fb')[0];
+    var uri = elementSharefb.dataset.url;
+    var token = '666987483466439|b3e1a0948513223b0bc51b32a735e2cf';
+
+    $.ajax({
+                url: 'https://graph.facebook.com/v2.7/',
+                dataType: 'jsonp',
+                type: 'GET',
+                data: { 
+                    access_token: token, 
+                    id: uri 
+                },
+                success: function(data){
+                   if ( data.share.share_count >= 0 ) $('#shares_count').text( data.share.share_count ); 
+                   else $('#shares_count').remove();
+                },
+                error: function(data){
+                   $('#shares_count').remove();
+                }
+    });
+
+    document.getElementById('shareFBBtn').addEventListener('click', function(){
+        $(elementSharefb).trigger('click');
+    });
+
+
+    
+    // elementSharefb.onclick = function() {
+    //   FB.ui({
+    //     method: 'share',
+    //     display: 'popup',
+    //     href: 'https://developers.facebook.com/docs/',
+    //   }, function(response){console.log(43)});
+    // }
+    
+    elementSharefb.onclick = function(event) {
+        event.stopPropagation();
+        var uri = this.dataset.url;
+        var token = '666987483466439|b3e1a0948513223b0bc51b32a735e2cf';
+        
+        FB.ui({
+          method: 'share',
+          href: uri,
+        }, function(response){
+            if (response && !response.error_code) {
+                
+                $.ajax({
+                  url: 'https://graph.facebook.com/v2.7/',
+                  dataType: 'jsonp',
+                  type: 'GET',
+                  data: { 
+                      access_token: token, 
+                      id: uri 
+                  },
+                  success: function(data){
+                    console.log(data);
+
+                    if ( data.share.share_count >= 0 ) $('#shares_count').text( data.share.share_count + 1 );
+                  }
+                });
+
+                if ( elementSharefb.dataset.scoring_user != 0 ) {
+                  
+                  $.ajax({
+                    url: location.origin + '\/wp-admin\/admin-ajax.php',
+                    type: 'POST',
+                    data: { 
+                      action: 'fb_share',
+                      scoring_user: elementSharefb.dataset.scoring_user,
+                      scoring_points: elementSharefb.dataset.scoring_points,
+                      trigger: elementSharefb.dataset.trigger,
+                    },
+                    success: function(data){
+                      console.log( JSON.parse(data) );
+                    }
+                  });
+
+                }
+                console.log("OK: "+JSON.stringify(response));
+            }
+            else {
+                console.log("NOT OK: "+JSON.stringify(response));
+                //console.log(fb_share_btn.data('point_id'));
+                //console.log(uri);
+               // var data = {
+                        //action: 'facebook_answer', 
+                        //point_id: fb_share_btn.data('point_id')
+                        //access_token: token
+                //};
+                // $.ajax({
+                //     url: location.origin + '\/wp-admin\/admin-ajax.php',
+                //     type: 'POST',
+                //     data: data,
+                //     success: function(data){
+                //         //console.log(data);
+                //         $('#shares_count').text( data.share.share_count );
+                //     }
+                // });
+            }
+        });
+
+
+
+       //  FB.ui({
+       //      method: 'share',
+       //      href: uri
+
+       //      // action_properties: JSON.stringify({
+       //      //     object: {
+       //      //         'og:url': this.dataset.url,
+       //      //         'og:title': this.dataset.title,
+       //      //         'og:description': '',
+       //      //         'og:image': this.dataset.image,
+       //      //         'og:image:secure_url': this.dataset.image,
+       //      //         'og:image:width': 1200,
+       //      //         'og:image:height': 630
+       //      //     }
+       //      // })
+       //  },
+       //  function (response) {
+       //      if (response && !response.error_code) {
+       //          console.log("OK: "+JSON.stringify(response));
+       //          // $.ajax({
+       //          //     url: 'https://graph.facebook.com/v2.7/',
+       //          //     dataType: 'jsonp',
+       //          //     type: 'GET',
+       //          //     data: {
+       //          //         id: uri,
+       //          //         access_token: token
+       //          //     },
+       //          //     success: function(data){
+       //          //         console.log(data);
+       //          //         $('#shares_count').text( data.share.share_count );
+       //          //     }
+       //          // });
+       //      } else {
+       //          console.log("Not OK: "+JSON.stringify(response));
+       //      }
+
+       // });
+
+    }
+    // jQuery('#post-share-button').click(function(e) {
+    
+    //  window.open(this.href,
+    //   'facebook_share',
+    //    'height=575, width=640, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no'
+    //    );
+        
+    //     jQuery.ajax({
+    //     type: 'POST',
+    //     dataType: 'json',
+    //     url: ajax_share_object.ajaxurl,
+    //     data: {
+    //         'action': 'ajaxshare',
+    //         'post_id': this.dataset.post
+    //     },
+    //     success: function(data) {      
+    //         console.log('success');
+         
+    //     },
+    //     error: function(data) {
+    //         console.log('error');
+
+    //     }
+    // });
+    //     e.preventDefault();
+    // });
+//};
+
+
+});
+// jQuery(document).ready(function() {   
+
+//     jQuery('#post-share-button').click(function(e) {
+
+//         window.open(this.href,
+//       'facebook_share',
+//        'height=575, width=640, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no'
+//        );
+        
+//         jQuery.ajax({
+//             type: 'POST',
+//             dataType: 'json',
+//             url: ajax_share_object.ajaxurl,
+//             data: {
+//                 'action': 'ajaxshare',
+//                 'post_id': this.dataset.post
+//             },
+//             success: function(data) {
+//                 //console.log(data);   
+//             },
+//             error: function(data) {
+//                 //console.log(data);
+
+//             }
+//         });
+
+//         e.preventDefault();
+    
+//         jQuery.ajax({
+//             type: 'POST',
+//             dataType: 'json',
+//             url: ajax_share_object.ajaxurl,
+//             data: {
+//                 'action': 'ajaxincrementpostshares',
+//                 'share_user_ip' : this.dataset.userip,
+//                 'share_user_id': this.dataset.userid,
+//                 'post_id': this.dataset.post,
+//                 'insert': this.dataset.insert
+//             },
+//             success: function(data) {
+                
+//                 //console.log(data);
+//                 //jQuery('#post-like-button').addClass('like-btn-non');
+//                 jQuery('#shares-count').html(data);
+//             },
+//             error: function(data) {
+//                 console.log(data);
+//             }
+//         });
+//         e.preventDefault();
+//     });
+
+//     jQuery('#post-share-button-non').click(function(e) {
+//         e.preventDefault();
+//     });
+// });

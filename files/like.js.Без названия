@@ -1,0 +1,34 @@
+jQuery(document).ready(function() {
+   
+
+    jQuery('#post-like-button').click(function(e) {
+    
+        jQuery.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: ajax_like_object.ajaxurl,
+        data: {
+            'action': 'ajaxincrementpostlikes',
+            'like_user_ip' : this.dataset.userip,
+            'like_user_id': this.dataset.userid,
+            'post_id': this.dataset.post,
+            'insert': this.dataset.insert
+        },
+        success: function(data) {
+            
+            //console.log(data);
+            // jQuery('#post-like-button').addClass('like-btn-non');
+            jQuery('#likes-count').html(data);
+        },
+        error: function(data) {
+            console.log(data);
+        }
+    });
+        e.preventDefault();
+    });
+
+    jQuery('#post-like-button-non').click(function(e) {
+        
+        e.preventDefault();
+    });
+});

@@ -1,0 +1,36 @@
+jQuery(document).ready(function($) {
+    "use strict"
+
+    $('#header-navbar-btn').click(function(){
+        $('.second-menu').toggle();
+        $('.body-filter').addClass('active-filter');
+        $('.body-color').addClass('body-color-active');
+    });
+
+    $('#close_second-menu').click(function(){
+        $('.second-menu').toggle();
+        $('.body-filter').removeClass('active-filter');
+        $('.body-color').removeClass('body-color-active');
+    });
+
+    $('.search-icon').click(function(){
+    	$('.second-menu').hide();
+    	$('.search-main').toggle();
+    	$('.body-filter').addClass('active-filter');
+        $('.body-color').addClass('body-color-active');
+    });
+
+    $('.btn-close-search').click(function(){
+    	$('.search-main').toggle();
+    	$('.body-filter').removeClass('active-filter');
+        $('.body-color').removeClass('body-color-active');
+    });
+
+        $(document).mouseup(function (e){ 
+        var div = $(".second-menu");
+        if (!div.is(e.target) 
+            && div.has(e.target).length === 0) {
+            div.hide() && $('.body-color').removeClass('body-color-active') && $('.body-filter').removeClass('active-filter');
+            }
+        });
+});

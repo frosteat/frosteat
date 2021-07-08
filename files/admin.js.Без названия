@@ -1,0 +1,177 @@
+jQuery(document).ready(function($) {
+    "use strict"
+        /*var allRow = $('[data-rowid]').children().first();
+         console.log (allRow);
+        $(allRow).each(function(){
+             $(this).css("color", "green");
+        })*/
+    function deleteRow(e) {
+            
+            var id = $(this).data('id');
+            var table_id = $(this).parents('table').attr('id');
+
+            var answer = confirm("Вы уверены, что хотите удалить запись?");
+            if ( !answer ) return;
+
+            $.ajax({
+                method: 'post',
+                url: location.origin + '\/wp-admin\/admin-ajax.php',
+                data: {
+                    action: 'deletepoll',
+                    id: id,
+                },
+                success: function(response) {
+                    $('[data-rowid="'+id+'"]').remove();
+
+                    if ( table_id == 'table_main' ) {
+                        $('#table_main tr').not( $('#table_main tr').eq(0) ).each(function(i, el){
+                            $(el).find('td').eq(0).text(i+1);
+                        });
+                    }
+
+                    if ( table_id == 'table_second' ) {
+                        $('#table_second tr').not( $('#table_second tr').eq(0) ).each(function(i, el){
+                            $(el).find('td').eq(0).text(i+1);
+                        });
+                    }
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
+    }
+  //$("#add_poll, #add_poll_friend").on('click', function (e) {
+    $('.add_poll').each(function(index, element){
+
+        $(element).on('click', function(e) {
+            var element = $(this);
+
+            var elem_number = $(this).data('number');
+            
+            
+            var elem_type = $(this).data('type');
+            if (elem_type == "main"){
+                var title = $('#title_main').val();
+                var points = $('#points_main').val();
+                var url_point = $('#ulr_point_main').val();
+            }else{
+                var title = $('#title_second').val();
+                var points = $('#points_second').val();
+                var url_point = $('#ulr_point_second').val();
+            }
+
+            if ( title.length > 0 && points.length > 0 ) {
+
+                $.ajax({
+                    method: 'post',
+                    url: location.origin + '\/wp-admin\/admin-ajax.php', 
+                    data: {
+                        action: 'addpoll',
+                        title: title,
+                        points: points,
+                        url_point: url_point,
+                        type : elem_type,
+                    },
+                    success: function(response) {
+                        var $tr = $('<tr data-rowid="'+response+'"></tr>');
+                        element.data('number', elem_number + 1);
+                        if ( elem_type == 'main' ) var index = $('#table_main tr').length;
+                        else var index = $('#table_second tr').length;
+                         var $td0 = $("<td>"+ index +"</td>");
+                        var $td1 = $("<td>"+response+"</td>");
+                        var $td2 = $("<td><input id=title_"+response+" class=name_input type=text value="+title+"></td>");
+                        var $td3 = $("<td><input id=points_"+response+" class=points_input type=number value="+points+"></td>");
+                        var $td4 = $("<td><input id=points_"+response+" class=points_input type=number value="+url_point+"></td>");
+                        var $td5 = $("<td><input type=submit class=update_poll data-id="+response+" value=Обновить></td>");
+                        var $td6 = $("<td style='text-align: center;'><input style='color: red;' data-id="+response+" type=submit class=delete_poll value=X></td>");
+
+                        $td6.children().on('click', deleteRow);
+
+                        $tr.append($td0).append($td1).append($td2).append($td3).append($td4).append($td5).append($td6);
+                        if(elem_type == "main"){
+                            $('#table_main').append($tr);
+                            $('#title_main').val('');
+                            $('#points_main').val('');
+                            $('#ulr_point_main').val('');
+                        }else{
+                            $('#table_second').append($tr);
+                            $('#title_second').val('');
+                            $('#points_second').val('');
+                            $('#ulr_point_second').val('');
+                        }
+                   },
+                    error: function(response) {
+                       console.log(response);
+                    }
+                });
+            }
+        });
+    })
+
+    $('.update_poll').each(function(index, element){
+        $(element).on('click', function(e) { 
+            var elem_update = $(element).data('id');
+            var title = $('#title_' + elem_update).val();
+            var points =  $('#points_' + elem_update).val();
+            var url_point = $('#ulr_point_' + elem_update).val();
+            $.ajax({
+                method: 'post',
+                url: location.origin + '\/wp-admin\/admin-ajax.php',
+                data: {
+                    action: 'updatepoll',
+                    data: $.param({
+                        id: elem_update,
+                        title: title,
+                        points: points,
+                        url_point: url_point})
+                    },
+                success: function(response) {
+                    $('#title_' + elem_update).val(title);
+                    $('#points_' + elem_update).val(points);
+                    $('#ulr_' + elem_update).val(url_point);
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
+        });
+    })
+
+    $('.delete_poll').each(function(index, element){
+        $(element).on('click', deleteRow);
+    })
+
+
+
+    // $(".list_polls_headers li").not(".download_all").click(function(){
+        
+    //     var pos = $(this).data('position');
+    //     var poll_data = '.list_polls_data' + pos;
+
+    //     $(".list_polls_headers li").removeClass('active_header');
+    //     $(this).addClass('active_header');
+    
+    //     $(".list_polls_data").hide();
+    //     $(poll_data).show();
+    // });
+
+
+    $(".under_back").each(function(i,index){
+        var w = Math.round( Math.random()*100) + '%';
+        $(this).css('width', w);
+    });
+
+    $('.btn_friends').on('click', function(e) {
+        $('.btn_friends').addClass("active");
+        $('.btn_main').removeClass("active");
+        $('.friends-coins').css('display', 'block');
+        $('.main-coins').css('display', 'none');
+    })
+
+    $('.btn_main').on('click', function(e) {
+        $('.btn_main').addClass("active");
+        $('.btn_friends').removeClass("active");
+        $('.main-coins').css('display', 'block');
+        $('.friends-coins').css('display', 'none');
+    })
+});   

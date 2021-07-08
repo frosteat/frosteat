@@ -1,0 +1,95 @@
+jQuery(document).ready(function($) {
+    "use strict"
+
+    var banner = $('[data-banner]'); // all banners
+
+    // Check visible banner
+    // param node node - element for check 
+    // return bool
+    function isVisible(node) {
+        var visibleArea = {
+            topLeft: {
+                x: $(document).scrollLeft(),
+                y: $(document).scrollTop()
+            },
+            bottomRight: {
+                x: $(window).width() + $(document).scrollLeft(),
+                y: $(window).height() + $(document).scrollTop()
+            }
+        };
+        var nodeCoords = {
+            topLeft: {
+                x: $(node).offset().left,
+                y: $(node).offset().top
+            }, 
+            bottomRight: {
+                x: $(node).offset().left + $(node).width(),
+                y: $(node).offset().top + $(node).height()
+            }
+        }
+        var nodeWidth = $(node).width();
+
+        var isMobileBanner = $(node).parents('[data-bannermobile]').length ? true : false
+        var isMobileWindow = innerWidth < 768 ? true : false
+        var isVisibleBanner = (( isMobileWindow && isMobileBanner ) || ( !isMobileWindow && !isMobileBanner )) ? true : false
+
+        if ( nodeCoords.topLeft.x >= visibleArea.topLeft.x &&
+            nodeWidth > 0 &&
+            nodeCoords.topLeft.y >= visibleArea.topLeft.y &&
+            nodeCoords.bottomRight.x <= visibleArea.bottomRight.x &&
+            nodeCoords.bottomRight.y <= visibleArea.bottomRight.y && isVisibleBanner ) { 
+            return true
+        } else { 
+            return false
+        }
+    }
+
+    // Window scroll, send banner`s id in the server 
+    $(window).on('scroll', function() { 
+        $(banner).each(function(index, element) {
+            var banner_id = undefined
+
+            if (isVisible(element) == true && !$(element).hasClass('_visible')) {
+                banner_id = $(element).data('id');
+
+                $('[data-banner][data-id="' + banner_id + '"]').addClass('_visible')
+
+                $.ajax ({
+                    method: 'POST',
+                    url: location.origin + '\/wp-admin\/admin-ajax.php',
+                    data: {
+                        action: 'uploadbannerview',
+                        id: banner_id
+                    },
+                    success: function(response) {
+                        var dataObg = JSON.parse(response);
+                        //console.log(dataObg) 
+                    },
+                    error: function(response) {
+                    }
+               });           
+            } 
+        });    
+    });
+
+    // Click on banners, send banner`s id in the server 
+    $(banner).on('click', function(e) {
+        var banner_id = $(this).data('id');
+      //  e.preventDefault();
+        
+        $.ajax ({
+            method: 'POST',
+            url: location.origin + '\/wp-admin\/admin-ajax.php',
+            data: {
+                action: 'uploadbannerclick',
+                id: banner_id
+            },
+            success: function(response) {
+                var dataObg = JSON.parse(response);  
+                //console.log(dataObg);    
+            },
+            error: function(response) {
+            }
+        });      
+    })
+});    

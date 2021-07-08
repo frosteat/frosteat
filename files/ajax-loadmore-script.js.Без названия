@@ -1,0 +1,305 @@
+jQuery(document).ready(function($) 
+{   
+    // $('.grid_blyuda').masonry(
+    // {
+    //     columnWidth: 230,
+    //     itemSelector: '.grid-item',
+    //     gutter: 10,
+    //     isFitWidth: true
+    // })
+
+$('#load-more').on('click', function(e) {
+        var href = this;
+        href.textContent = 'Загрузка...';
+        var placeIdLength = 0
+        var curPlaceId
+
+        if ( href.dataset.placeid === undefined )
+        {
+            curPlaceId = href.dataset.placeid
+        }
+        else if ( location.pathname == '/blyuda/' || location.pathname == '/zavedeniya/' )
+        {
+
+            var placeIdLength = href.dataset.placeid.split(',').length
+
+            if ( placeIdLength >= +href.dataset.endposid )
+                curPlaceId = href.dataset.placeid.split(',').slice(href.dataset.curposid,href.dataset.endposid).join(',')
+            else
+                curPlaceId = href.dataset.placeid.split(',').slice(href.dataset.curposid,placeIdLength).join(',')
+        }
+        else
+        {
+            curPlaceId = href.dataset.placeid
+        }
+ //console.log(curPlaceId)       
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: ajax_loadmore_object.ajaxurl,
+            data: {
+                'action': 'ajaxloadmoreposts',
+                'category': this.dataset.category,
+                'postscount': this.dataset.postscount,
+                'plid': this.dataset.plid,
+                'posttype': this.dataset.posttype,
+                'count_max_prod': this.dataset.count_max_prod,
+                'offset': this.dataset.offset,
+                'author': this.dataset.author,
+                'placeid': curPlaceId,
+                'placescategory': this.dataset.placescategory
+            },
+            success: function(data) {
+                var item, html
+                                
+                var $elems = []
+                href.textContent = 'Загрузить ещё';
+
+                if (href.dataset.category != 'all') 
+                {
+                    var postsLength = data.posts.length
+
+                    for (var i = 0; i < postsLength; i++) 
+                    {
+                        $elems[i] = $(data.posts[i])['0'];
+                    }
+
+                    $elems = $($elems)
+
+                    $('.grid_blyuda').append($elems).masonry('appended', $elems);
+           
+
+                    href.dataset.offset = Number(href.dataset.offset) + Number(href.dataset.postscount);
+                    if ( href.dataset.placeid !== undefined )
+                    {
+                        href.dataset.endposid = +href.dataset.endposid + +href.dataset.startposid
+                        href.dataset.curposid = +href.dataset.curposid + +href.dataset.startposid
+                    }
+
+                    if ( +href.dataset.offset >= +href.dataset.maxplaceid )
+                        $(href).hide()
+                } 
+                else 
+                {
+                    var firstPartLength = data.first_part.length;
+                    var secondPartLength = data.second_part.length;
+                    href.dataset.offset = Number(href.dataset.offset) + 1;
+
+                    if (firstPartLength == 0 && data.tour == null && secondPartLength == 0)
+                    {
+                        $(href).hide();
+                        return;
+                    }
+                    if (firstPartLength > 0)
+                    {
+                        for (var i = 0; i < firstPartLength; i++)
+                        {   
+                            $elems[i] = $(data.first_part[i])['0']
+                        }
+
+                        var $elemsLength = $elems.length - 1
+                        if (secondPartLength > 0)
+                        {
+                            for (var i = 0; i < secondPartLength; i++) 
+                            {
+                                $elems[$elemsLength + i] = $(data.second_part[i])['0'];
+                            }
+                        }
+                        
+                        $elems = $($elems)
+                        $('.grid_blyuda').append($elems).masonry('appended', $elems);
+                    }
+                    if (data.tour)
+                    {
+                        html = data.tour;
+                        $(html).insertBefore($('#more-posts-point'));
+                    }
+                }
+
+                 //console.log(data);
+            },
+            error: function(data) {
+                console.log(data);
+            }
+        });
+        e.preventDefault();
+    });
+
+
+    
+
+
+    $('#xs-food-load-more').on('click', function(e) {
+        var href = this;
+        href.innerHTML = 'Загрузка...';
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: ajax_loadmore_object.ajaxurl,
+            data: {
+                'action': 'ajaxloadmoreposts-xs',
+                'category': this.dataset.category,
+                'postscount': this.dataset.postscount,
+                'offset': this.dataset.offset,
+            },
+            success: function(data) {
+                var item, html;
+                href.innerHTML = 'Загрузить ещё';
+                for (var i = 0; i < data.posts.length; i++) {
+                    item = $(data.posts[i]);
+                    jQuery('#xs-food-block').masonry().append(item).masonry('appended', item);
+                }
+                href.dataset.offset = Number(href.dataset.offset) + Number(href.dataset.postscount);
+                if (data.count < Number(href.dataset.postscount)) $(href).hide();
+            },
+            error: function(data) {
+                console.log(data);
+            }
+        });
+        e.preventDefault();
+    });
+    $('#xs-recipe-load-more').on('click', function(e) {
+        var href = this;
+        href.innerHTML = 'Загрузка...';
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: ajax_loadmore_object.ajaxurl,
+            data: {
+                'action': 'ajaxloadmoreposts-xs',
+                'category': this.dataset.category,
+                'postscount': this.dataset.postscount,
+                'offset': this.dataset.offset,
+            },
+            success: function(data) {
+                var item, html;
+                href.innerHTML = 'Загрузить ещё';
+                for (var i = 0; i < data.posts.length; i++) {
+                    item = $(data.posts[i]);
+                    jQuery('#xs-recipe-block').masonry().append(item).masonry('appended', item);
+                }
+                href.dataset.offset = Number(href.dataset.offset) + Number(href.dataset.postscount);
+                if (data.count < Number(href.dataset.postscount)) $(href).hide();
+            },
+            error: function(data) {
+                console.log(data);
+            }
+        });
+        e.preventDefault();
+    });
+  
+
+
+    $('#load-more_button').on('click', function(e) {
+        e.preventDefault();
+        var element = $(this);
+        element.text('Загрузка...');
+        var elem_number = element.data('offset');
+        var count =  element.data('count');
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: ajax_loadmore_object.ajaxurl,
+            data: {
+                'action': 'ajaxloadmoreachievement',
+                'limit' : element.data('limit'),
+                'offset' : element.data('offset')
+            },
+            success: function(data) {
+                //console.log(data)
+                element.data('offset', elem_number + 10);
+                element.data('off_ach', elem_number + data.length);
+                for (var i = 0; i < data.length ; i++) {
+                    $('#table_achievement > tbody:last-child').append('<tr><td class="success_date">'+data[i]['date']+'</td><td class="success_time">'+data[i]['time']+'</td><td class="text_success">'+data[i]['title']+'</td><td class="positive_point">+'+data[i]['points']+' eatcoins</td></tr>');
+                }
+                if($('#load-more_button').data('off_ach') == count){
+                    element.hide();
+                }else{
+                    element.text('Загрузить ещё');
+                }
+            },
+            error: function(data) {
+                console.log(data);
+            }
+        });
+        e.preventDefault();
+    });
+
+    $('.place_estimation, .single_place_estimation').click(function(e){
+        e.preventDefault();
+        var btn_class = this.className;
+        var btn = this;
+        var id = this.dataset.place_id;
+        var href = $(this).attr('href');
+        $.ajax({
+            method: 'post',
+            url: location.origin + '\/wp-admin\/admin-ajax.php',
+            data: {
+                action: 'islogin',
+                place_id: $(this).data('place_id') || null
+            },
+            success: function(response) {
+                //console.log(JSON.parse(response));
+                var resp = JSON.parse(response);
+                if ( resp[0] == false ) {
+                    if ( btn_class.indexOf('single_place_estimation') != -1 ) {
+                        $('.single_place_estimation').text('').css({
+                            'background-image': 'url(/wp-content/themes/posteat/images/preloader.gif)',
+                            'background-color': 'transparent',
+                            'min-height'    : '42px',
+                            'border'        : '1px solid #3ca773'
+                        });
+                        $(this).addClass('btn_focus');
+                        location.search = '?from_poll=1&place=' + id;
+                    } else if ( btn_class.indexOf('place_estimation') != -1 ) {
+                        $('.place_estimation').text('').css({
+                            'background-image': 'url(/wp-content/themes/posteat/images/preloader.gif)',
+                            'height'          : '36px',
+                            'width'           : '147.81px'
+                        }).parent().css('height', '36px');
+                        location.search = '?from_poll=1';
+                    } else {
+                        $('.modal.bs-example-modal.modal-enter').modal();
+                    }
+                }
+                if ( resp[0] == true ) {
+                    if ( Boolean(resp[1]) ) location.href = location.origin + href + '?place=' + resp[1];
+                    else location.href = location.origin + href;
+                }
+            },
+            error: function(response) {
+                //console.log(response);
+            }
+        });
+    });
+
+    // window.addEventListener('load', function(){
+    // handling redirect from home_url/polls for unregistered user
+    
+    if ( location.search.indexOf('?from_poll=1') != -1 ) {
+        $.ajax({
+            method: 'post',
+            url: location.origin + '\/wp-admin\/admin-ajax.php',
+            data: {
+                action: 'transition_from_poll'
+            },
+            success: function(response) {
+                var resp = JSON.parse(response);
+                if ( resp == false ) {
+                    $('.modal.bs-example-modal.modal-enter').modal();
+                }
+                if ( resp == true ) {
+                    if ( location.search.indexOf('place') != -1 ) {
+                        var place_id = location.search.split('&')[1].split('=')[1];
+                        location.href = location.origin + '/polls/?place=' + place_id;
+                    }
+                    else location.href = location.origin + '/polls';
+                }
+            },
+            error: function(response) {
+                //console.log(response);
+            }
+        });               
+    }
+    // });
+});

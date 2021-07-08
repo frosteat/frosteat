@@ -1,0 +1,71 @@
+jQuery(document).ready(function($) {
+    console.log($('#scoring_register').val(), $('#scoring_parent').val());
+    $('form#signup').on('submit', function(e) {
+        e.preventDefault();
+        var statusNode = $('form#signup p#signup-status');
+        statusNode.show().text(ajax_signup_object.loadingmessage);
+        if ($('form#signup #signup-username').val() == '') {
+            statusNode.text('Пожалуйста, введите логин!');
+            return
+        }
+        if ($('form#signup #signup-email').val() == '') {
+            statusNode.text('Пожалуйста, введите email!');
+            return
+        }
+        var pass = $('form#signup #signup-password').val();
+        if (pass == '') {
+            statusNode.text('Пожалуйста, введите пароль!');
+            return
+        }
+        if (pass != $('form#signup #signup-password-double').val()) {
+            statusNode.text('Пароли не совпадают.');
+            return
+        }
+        if (pass.length < 5) {
+            statusNode.text('Пароль слишком короткий.');
+            return
+        }
+        if ($('form#signup #signup-birthday').val() == '') {
+            statusNode.text('Пожалуйста, введите дату Вашего рождения!');
+            return
+        }
+        if ($('form#signup #signup-gender').val() == '') {
+            statusNode.text('Пожалуйста, введите Ваш пол!');
+            return
+        }
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: ajax_signup_object.ajaxurl,
+            data: { 
+                'action'  : 'ajaxsignup', //calls wp_ajax_nopriv_ajaxlogin
+                'username': $('form#signup #signup-username').val(),
+                'email'   : $('form#signup #signup-email').val(),
+                'password': $('form#signup #signup-password').val(),
+                'birthday': $('form#signup #signup-birthday').val(),
+                'gender'  : $('form#signup #signup-gender').val(),
+                'city'    : $('form#signup #signup-city').val(),
+                'security1': $('form#signup #security1').val(),
+                'token' : $("#token").val(),
+                'scoring_register' : $('#scoring_register').val(),
+                'scoring_parent' : $('#scoring_parent').val(),
+                },
+            success: function(data) {
+                console.log(data);
+                $('form#signup p#signup-status').text(data.message);
+                $('#lostpwd-link').show();
+                if (data.signup == true) {
+                    if ( location.search.indexOf('?from_poll=1') != -1 ) {
+                        if (location.search.indexOf('place') != -1) {
+                            var place_id = location.search.split('&')[1].split('=')[1];
+                            location.href = location.origin + '/polls/?place=' + place_id;
+                        } else location.href = location.origin + '/polls';
+                    } else document.location.href = ajax_signup_object.redirecturl;
+                }
+            },
+            error: function(err){
+                console.log(err);
+            }
+        });
+    });
+});

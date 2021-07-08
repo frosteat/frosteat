@@ -1,0 +1,151 @@
+jQuery(document).ready(function($) {
+
+	var block = $('#poll-block')
+	var keyBlockListener = false
+
+	function add_vote(event)
+	{
+		event.preventDefault()
+
+		$(this).remove()
+		$('.poll-number-votes').remove()
+		$('.poll-vote-result').find('p').remove()
+		block.attr('data-votes', Number(block.data('votes')) + 1)
+
+		var pollID = $('.mes_your_choice').data('id')
+
+		$('.poll-vote-result')
+			.append($('<div class="poll-vote-result-bar"></div>'))
+
+		$('.mes_your_choice')
+			.removeClass("mes_your_choice active")
+			.find('.poll-vote-result-bar')
+			.addClass('your_vote')
+	
+
+		$.ajax({
+			method: 'post',
+			url: poll_frontend_object.ajaxurl,
+			data: {
+				action: 'pe_poll_register_vote',
+				poll_id: block.find('.poll-id').val(),
+				vote: pollID
+			},
+			success: function(response) {
+				// console.log(response);
+				var data = JSON.parse(response);
+
+				console.log(data)
+				
+				updateBars(data);
+				// setTimeout(updateBars, 1000, data);
+			},
+			error: function(response) {
+				console.log(response);
+			}
+		});
+	}
+
+
+	$('.can_choice').on('click', function(event)
+	{
+		$('#btn_poll.noactive')
+			.removeClass('noactive')
+			.addClass('active')
+			.attr('title', 'Голосовать')
+
+		if ( !$('#btn_poll').attr('data-target') && !keyBlockListener)
+		{
+				$('#btn_poll').on('click', add_vote)
+				keyBlockListener = true;
+		}
+			$('.poll-vote-result').removeClass("mes_your_choice active")
+			$(this).addClass("mes_your_choice active")
+	})
+	   
+	
+
+
+
+	// jQuery('.poll-vote-bar').unbind().on('click', function(e) {
+	// 	jQuery('.poll-vote-bar').off('click');
+	// 	e.preventDefault();
+	// 	if ($(this).hasClass('inactive')) return;
+	// 	$('.poll-vote-bar').each(function(index, item) {
+	// 		// console.log(item);
+	// 		$(item).removeClass('poll-vote-bar').removeClass('active').addClass('poll-vote-result');
+	// 		$(item).append($('<div class="poll-vote-result-bar"></div>'));
+	// 	});
+	// 	var block = $(this).parent();
+	// 	$.ajax({
+	// 		method: 'post',
+	// 		url: poll_frontend_object.ajaxurl,
+	// 		data: {
+	// 			action: 'pe_poll_register_vote',
+	// 			poll_id: block.find('.poll-id').val(),
+	// 			vote: $(this).data('id')
+	// 		},
+	// 		success: function(response) {
+	// 			// console.log(response);
+	// 			var data = JSON.parse(response);
+
+	// 			console.log(data)
+	// 			updateBars(block, data);
+	// 			// setTimeout(updateBars, 1000, data);
+	// 		},
+	// 		error: function(response) {
+	// 			console.log(response);
+	// 		}
+	// 	});
+	// });
+
+	$(block).each(function()
+	{
+		var data = {};
+		block.find('.poll-vote-result').each(function(j, bar) {
+			data[bar.dataset.id] = {
+				value: bar.dataset.value
+			}
+		});
+		// console.log(data);
+		updateBars(data);
+	});
+
+
+function updateBars(data) {
+	// console.log(data);
+	var total = 0;
+
+	var numberOfVotes = 0;
+	for (var key in data) {
+		if (key != 'date') {
+			// console.log(data[key]);
+			total += Number(data[key].value);
+		}
+	}
+	// console.log(total);
+	for (var key in data) {
+		if (key != 'date') {
+			numberOfVotes = data[key].value ? data[key].value : 0
+
+			data[key].percent = (numberOfVotes / total) * 100;
+			block.find('*[data-id="' + key + '"]').find('.poll-vote-result-bar').before($('<p>' + plural_form(numberOfVotes, ['голос', 'голоса', 'голосов']) + '</p>'));
+			block.find('*[data-id="' + key + '"]').find('.poll-vote-result-bar').css('width', data[key].percent + '%');
+		}
+	}
+
+	if ( $('.your_vote').length )
+	{
+		block.append($('<p class="poll-number-votes">Всего голосов: ' + block.attr('data-votes') + '</p>'));
+		$('.can_choice').removeClass('can_choice')
+	}
+}
+
+function plural_form(number, after)
+{
+      var cases = [2, 0, 1, 1, 1, 2];
+      
+      return number + ' ' + after[ (number % 100 > 4 &&  number % 100 < 20) ? 2 : cases[Math.min(number % 10, 5)] ];
+}
+
+});

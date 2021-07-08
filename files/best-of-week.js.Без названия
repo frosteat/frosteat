@@ -1,0 +1,66 @@
+// jQuery(document).ready(function($){
+
+// 	var parent_block = $('.block_sidebar'),
+// 		parent_block_height = parent_block.height(),
+// 		content_block = $('.block_content'),
+// 		content_block_height = content_block.height(),
+// 		prev_block = $('.best-week-block').prev(),
+// 		block = $('.best-week-block'),
+// 		window_width = $(window).width();
+
+//  	if (content_block_height > parent_block_height) {
+
+// 	    $(window).scroll(function(){
+
+// 	    	var top = $(this).scrollTop(),
+// 				parent_block_top = parent_block.offset().top,
+// 				parent_block_width = parent_block.width(), 
+// 	      		block_top = block.offset().top,
+// 	      		block_height = block.height(),		      	 
+// 	      		prev_block_top = prev_block.offset().top,
+// 	      		prev_block_height = prev_block.height(),
+// 	      		prev_block_res = prev_block_top + prev_block_height,
+// 	      		next_block_top = $('.block_bottom').offset().top,
+// 	        	top_absolute_if = next_block_top - block_height,
+// 	        	top_absolute_val = next_block_top - block_height - parent_block_top;
+	  				    
+// 	    	if (top < prev_block_res) {
+// 					block.css({position: "static", top: 0, width: parent_block_width}); 
+// 				}
+// 		    if (top > prev_block_res) {
+// 					block.css({position: "fixed", top: 0, width: parent_block_width});
+// 					}
+// 		    if (top > top_absolute_if) {
+// 					block.css({position: "absolute", top: top_absolute_val}); 
+// 				}    
+// 		});
+
+// 	}
+// 	else
+// 	{
+
+// 		var replace_block = block.remove()
+// 		//prev_block.remove()
+
+// 		if ( $(".wrapper-long-ad-block-2").length )
+// 			$(".wrapper-long-ad-block-2").html(replace_block);
+			
+// 	}
+
+// 	$(window).on('scroll', function()
+// 	{
+// 		if ( !$('.best-week-block').length )
+// 			return
+
+// 		var parent_bl_height = parent_block.height(),
+// 			content_bl_height = content_block.height()
+
+// 		if ( content_bl_height > parent_bl_height )
+// 			return 
+
+// 		var replace_block = block.remove()
+
+// 		if ( $(".wrapper-long-ad-block-2").length )
+// 			$(".wrapper-long-ad-block-2").html(replace_block);
+// 	})
+// });

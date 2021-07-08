@@ -1,0 +1,61 @@
+jQuery( document ).ready(function($)
+{
+	"use strict"
+	console.log('soc')
+	$("[data-facebook]").on('click', function(event) {
+		event.preventDefault()
+		//console.log(this)
+		FB.login(function(response) {
+			console.log('response', response)
+			
+			if (response.authResponse) {
+				console.log('Welcome!  Fetching your information.... ');
+				
+				FB.api('/me', {fields: 'id, last_name, first_name, birthday, email'}, function(response) {
+					var xhr = new XMLHttpRequest()
+					var fd = new FormData()
+			
+					fd.append('action', 'ajaxsocauth')
+					fd.append('id', response.id)
+					fd.append('l_name', response.last_name)
+					fd.append('f_name', response.first_name)
+					fd.append('email', response.email)
+		
+					xhr.open('POST', location.origin + '\/wp-admin\/admin-ajax.php')
+
+					if (xhr.readyState)
+					{
+						xhr.send(fd)
+
+						xhr.onreadystatechange = function()
+						{
+							if (this.readyState != 4) 
+								return
+
+					        if ( this.status == 200 )
+					        {
+					        	if ( location.search.indexOf('?from_poll=1') != -1 ) {
+					        		if ( location.search.indexOf('place=') != -1 ) {
+					        			var place_id = location.search.split('&')[1].split('=')[1];
+					        			location.href = location.origin + '/polls/?place=' + place_id;
+					        		}
+					        		else location.href = location.origin + '/polls';
+					        	}
+								else location.href = location.origin;
+
+					        }
+					    }
+					}
+					console.log('response', response);	
+					console.log('Good to see you, ' + response.name + '.');
+				});
+			}
+			else {
+				console.log('User cancelled login or did not fully authorize.');
+			}
+		}, {
+			scope: 'publish_actions', 
+			return_scopes: true
+		});
+	})
+})

@@ -1,0 +1,181 @@
+jQuery(document).ready(function($) {
+	"use strict"
+	var $surname = $("#friend_surname");
+	var $name = $("#friend_name");
+	var $email = $("#friend_email");
+
+	$("#friend_surname, #friend_name, #friend_email").change(function(){
+		if( !$(this).val() ) {
+			
+			$(this).addClass("input_err");
+			return;
+		}
+		else {
+			if( $(this).attr("type") == "email" && !validateInviteEmail($(this).val()) ) {
+
+				$(this).addClass("input_err");
+				return;
+
+			} else $(this).removeClass("input_err");
+		}
+	});
+
+	$("#send_inviting_form").click( function(e){
+		e.preventDefault();
+
+		var surname = $("#friend_surname").val();
+		var name = $("#friend_name").val();
+		var email = $("#friend_email").val();
+		var page_name = $("#page_name").val();
+		var current_user_id = $("#current_user_id").val();
+		if(!surname) {
+			$surname.addClass("input_err");
+			return;
+		} else {
+			$surname.removeClass("input_err");
+		}
+
+		if(!name) {
+			$name.addClass("input_err");
+			return;
+		} else {
+			$name.removeClass("input_err");
+		}
+
+		if( !validateInviteEmail($email.val()) ) {
+			$email.addClass("input_err");
+			return;
+		} else {
+			$email.removeClass("input_err");
+		}
+
+		var data = {
+			surname: surname,
+			name:    name,
+			email:   email,
+			page_name: page_name,
+			current_user_id: current_user_id,
+			action:  'ajaxinviting'
+		};
+
+		
+		if ( surname && name && email) {
+			$.ajax({
+			  url: location.origin + '\/wp-admin\/admin-ajax.php',
+			  method: "post",
+			  data: data,
+			  success: function(data){
+			  	var data = JSON.parse(data);
+			  	console.log(data);
+			  	$('#hidden_answer').find('span').text(name + ' ' + surname);
+			  	$("#inviting_form").slideUp('slow');
+			  	$('#hidden_answer').delay(700).fadeIn('slow');
+			  },
+			  error: function(data){
+			  	console.log(data);
+			  }
+			});
+		}
+
+		
+	});
+
+function validateInviteEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
+
+	$('[data-scoring]').on('click', function (e) {
+		//e.preventDefault();
+		var user_id = $(this).data('scoring_user');
+		var point_id = $(this).data('scoring_points');
+		var trigger = $(this).data('trigger');
+		var token = $(this).data('token');
+		var parent_points = $(this).data('parent_points');
+	 	var parent = $(this).data('parent');
+
+        $.ajax({
+        	method: 'post',
+            url: location.origin + '\/wp-admin\/admin-ajax.php',
+            data: {
+            	action: 'savescoringuser',
+                user_id: user_id,
+                point_id: point_id,
+                trigger: trigger,
+                parent_points : parent_points,
+                parent : parent,
+            },
+            success: function(response) {
+                console.log(response);              
+            },
+            error: function(response) {
+                console.log(response);
+            }
+        });
+    });
+
+
+    $("#invite_friend_opros").click( function(e){
+		e.preventDefault();
+
+		var surname = $("#friend_surname").val();
+		var name = $("#friend_name").val();
+		var email = $("#friend_email").val();
+		var page_name = $("#page_name").val();
+		var user_id = $(this).data('id');
+
+		if(!surname) {
+			$surname.addClass("input_err");
+			return;
+		} else {
+			$surname.removeClass("input_err");
+		}
+
+		if(!name) {
+			$name.addClass("input_err");
+			return;
+		} else {
+			$name.removeClass("input_err");
+		}
+
+		if( !validateInviteEmail($email.val()) ) {
+			$email.addClass("input_err");
+			return;
+		} else {
+			$email.removeClass("input_err");
+		}
+
+		var data = {
+			surname: surname,
+			name:    name,
+			email:   email,
+			page_name: page_name,
+			user_id : user_id,
+			action:  'ajaxinvitingopsos'
+		};
+
+		
+		if ( surname && name && email) {
+			$.ajax({
+			  url: location.origin + '\/wp-admin\/admin-ajax.php',
+			  method: "post",
+			  data: data,
+			  success: function(data){
+			  	var data = JSON.parse(data);
+			  	if (data == 'empty') {
+			  		$('#hidden_answer_poll').modal('show');
+			  	}else{
+				  	console.log(data);
+				  	$('#hidden_answer').find('span').text(name + ' ' + surname);
+				  	$("#inviting_form").slideUp('slow');
+				  	$('#hidden_answer').delay(700).fadeIn('slow');
+				  }	
+			  },
+			  error: function(data){
+			  	console.log(data);
+			  }
+			});
+		}
+	});
+
+});

@@ -1,0 +1,27 @@
+jQuery(document).ready(function($) {
+	$('#liqpay-form').find('button').on('click', function(e) {
+		e.preventDefault();
+		var sum = $('#liqpay-form').find('input[name="sum"]').val();
+		if (sum == '' || sum == 0) return;
+		$.ajax({
+			method: 'post',
+			url: ajax_liqpay_button_object.ajaxurl,
+			data: {
+				action: 'liqpay_button_handler',
+				sum: sum
+			},
+			success: function(response) {
+				// console.log(response);
+				var form = $(response);
+				// form.attr('target', '_blank');
+				$(document.body).append(form);
+				form.submit();
+				// $(body).append(response);
+				// var form=document.forms[0];form.setAttribute("target", "_blank");form.submit();
+			},
+			error: function(response) {
+				console.log(response);
+			}
+		});
+	});
+});

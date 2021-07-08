@@ -1,0 +1,119 @@
+jQuery(document).ready(function($) {
+    
+    var page = ''
+
+    $('input[name="search_category"]:checked').each(function()
+    {
+        this.checked = false
+    });
+
+    $('a[data-toggle="tab"]').on('click', function (e)
+    {
+        page = e.target.getAttribute('aria-controls')
+
+        var $a = e.target.parentNode.parentNode.querySelector('a[class="active"]')
+        $a.classList.remove('active')
+        
+        e.target.classList.add('active')
+
+        $('input[name="search_category"]:checked').each(function()
+        {
+            this.checked = false
+        })
+    })
+
+    $('form#search-form').on('submit', function(e)
+    {
+        var cats = [];
+        var catstring = '';
+        var path = ''
+        
+        $('input[name="search_category"]:checked').each(function()
+        {
+            page = this.dataset.page
+            var taxonomy = this.dataset.tax
+            var id = this.value
+            var type
+
+            if ( page == 'blyuda')
+            {
+                path += '&' + id + '=' + taxonomy
+            }
+            else if ( page == 'recipe' )
+            {
+                if ( path == '' )
+                    path += '&id=' + id
+
+                path += ',' + id
+            }
+            else if ( page == 'zavedeniya' )
+            {
+                type = this.dataset.type
+                path += '&' + id + '=' + type
+            }
+
+           cats.push(this.value);
+        });
+
+        path += '&page=' + page
+//console.log(path)
+        $.ajax(
+        {// Отправляем данные о выбранных категориях на обработку для учета количества поиска
+            type: 'POST',
+            dataType: 'json',
+            url: ajax_search_object.ajaxurl,
+            data: {
+                'action': 'ajaxadvancedsearch',
+                'cats': cats },
+            success: function(data) {
+                //console.log(data);
+            },
+            error: function(data) {
+                // console.log(data);
+            }
+        });
+
+        var url = '?s=' + $('#search-input').val() + path;
+        //console.log(url);
+        window.location.href = url;
+        e.preventDefault();
+    });
+    
+    $('#advanced-search-opener').on('click', function(e) {
+        switch (this.dataset.action) {
+            case 'close':
+                this.dataset.action = 'open';
+                $('#advanced-search-block').slideUp('slow');
+                $('#search-opener-text').html('Развернуть расширенный поиск');
+                $('#search-down-arrow').html('&or;');
+
+                $('#myTabs a:first').tab('show')
+
+                $('li[role="presentation"]').each(function(pos)
+                {
+                    var $a = this.firstElementChild
+
+                    if ( !$a.classList.contains('active') && pos == 0)
+                        $a.classList.add('active')
+                    if ( $a.classList.contains('active') && pos != 0)
+                        $a.classList.remove('active')
+                });
+
+                // $('li[role="presentation"] a:first').tab('show');
+
+                page = ''
+                break;
+            case 'open':
+            default:
+                this.dataset.action = 'close';
+                $('#advanced-search-block').slideDown('slow');
+                $('#search-opener-text').html('Свернуть расширенный поиск');
+                $('#search-down-arrow').html('&and;');
+
+                page = 'blyuda'
+                break;
+        }
+        e.preventDefault();
+    });
+});
+

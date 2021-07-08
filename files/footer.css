@@ -1,0 +1,154 @@
+.footer {
+  height: 80px;
+  background: #262729; }
+  .footer .flex {
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+        justify-content: center;
+    -ms-align-items: stretch;
+    -ms-flex-align: stretch;
+        align-items: stretch;
+    height: 80px; }
+    .footer .flex > div {
+      display: -moz-flex;
+      display: -ms-flex;
+      display: -o-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-align-items: center;
+      -ms-flex-align: center;
+          align-items: center; }
+      .footer .flex > div nav {
+        text-align: center;
+        margin: 0 auto; }
+        .footer .flex > div nav.nav-alt a {
+          text-transform: uppercase;
+          color: #ffffff;
+          font-size: 11px !important;
+          padding: 14px 12px; }
+        .footer .flex > div nav a {
+          text-transform: uppercase;
+          color: #ffffff;
+          font-size: 12px;
+          padding: 14px 12px; }
+          @media (max-width: 1024px) {
+            .footer .flex > div nav a {
+              padding: 14px 10px; } }
+    @media (max-width: 767px) {
+      .footer .flex {
+        display: block;
+        height: auto; } }
+  .footer .social {
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+        justify-content: center;
+    -ms-align-items: center;
+    -ms-flex-align: center;
+        align-items: center; }
+    .footer .social a {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+      color: #828c8e;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 2.3;
+      background: #39393b;
+      border-radius: 100%;
+      margin: 0 6px; }
+      .footer .social a:hover {
+        text-decoration: none;
+        background: #828c8e;
+        color: #ffffff; }
+    @media (max-width: 767px) {
+      .footer .social {
+        margin: 15px auto 0; } }
+  @media (max-width: 767px) {
+    .footer {
+      height: auto;
+      padding-top: 18px;
+      padding-bottom: 18px; } }
+
+.logo-footer {
+  margin: 0 auto; }
+  .logo-footer img {
+    width: 140px;
+    height: 100%; }
+
+.footer-subcribe {
+  text-align: center; }
+  .footer-subcribe p {
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #828c8e;
+    font-family: 'PTSansBold';
+    margin-top: 5px;
+    margin-bottom: 0; }
+
+.bottom-footer {
+  background: #3c3d41; }
+  .bottom-footer .footer-second-menu {
+    margin-top: 30px;
+    text-align: center; }
+    .bottom-footer .footer-second-menu a {
+      margin: 0 20px;
+      color: #fff;
+      text-transform: uppercase;
+      font-size: 11px; }
+  .bottom-footer .flex {
+    height: 130px;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+        justify-content: center;
+    -ms-align-items: center;
+    -ms-flex-align: center;
+        align-items: center; }
+    .bottom-footer .flex p {
+      max-width: 155px;
+      height: 26.4px;
+      font-family: PTSans-Regular;
+      font-size: 10px;
+      letter-spacing: 0.8px;
+      color: #9b9b9b;
+      margin-bottom: 0; }
+  .bottom-footer form {
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: -ms-flexbox;
+    display: flex; }
+    .bottom-footer form input {
+      font-size: 14px;
+      color: #818183;
+      width: 285px;
+      height: 45px;
+      border-radius: 4px;
+      background: #2e2e30;
+      padding: 13px 13px 14px;
+      border: none;
+      outline: none;
+      margin: 0 7.5px; }
+    .bottom-footer form input[type="submit"] {
+      background: none;
+      text-transform: uppercase;
+      width: auto;
+      height: auto;
+      padding: 10px 10px 8px;
+      color: #ffffff;
+      font-size: 10px;
+      font-family: PTSans-Bold;
+      letter-spacing: 2px;
+      border-radius: 26px;
+      border: solid 1px rgba(255, 255, 255, 0.31); }
